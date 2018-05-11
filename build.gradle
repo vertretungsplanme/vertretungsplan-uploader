@@ -1,0 +1,85 @@
+buildscript {
+    ext.kotlin_version = '1.2.31'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.2'
+        classpath 'de.dynamicfiles.projects.gradle.plugins:javafx-gradle-plugin:8.8.2'
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+group 'app.vertretungsplan'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+apply plugin: 'javafx-gradle-plugin'
+apply plugin: 'edu.sc.seis.launch4j'
+
+sourceCompatibility = 1.8
+mainClassName = 'app.vertretungsplan.uploader.VertretungsplanUploaderMain'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile 'no.tornado:tornadofx:1.7.14'
+    compile 'com.jfoenix:jfoenix:8.0.3'
+    compile 'de.codecentric.centerdevice:javafxsvg:1.3.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jfx {
+    mainClass = mainClassName
+    vendor = 'vertretungsplan.app'
+    jfxMainAppJarName = "vertretungsplan-uploader-${version}.jar"
+
+    // gradle jfxNative
+    identifier = null
+    nativeReleaseVersion = version
+    needShortcut = false
+    needMenu = false
+    appName = "Vertretungsplan Uploader"
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Version': version,
+                'Main-Class': mainClassName
+    }
+    archiveName = project.name + '.jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+launch4j {
+    mainClassName = mainClassName
+    jar = "lib/${project.tasks.fatJar.archiveName}"
+    copyConfigurable = project.tasks.fatJar.outputs.files
+    bundledJrePath = "jre"
+    bundledJre64Bit = true
+    version = version
+    fileDescription = "Programm zum Hochladen von Vertretungsplänen"
+    copyright = "vertretungsplan.app"
+    companyName = "vertretungsplan.app"
+    productName = "Vertretungsplan Uploader"
+    //splashFileName = "../../../img/splash.bmp"
+    //icon = "../../../img/icon_on_shape.ico"
+}
