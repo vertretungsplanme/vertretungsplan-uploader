@@ -1,6 +1,7 @@
 package app.vertretungsplan.uploader.ui.style
 
 import javafx.geometry.Pos
+import javafx.scene.text.FontWeight
 import tornadofx.*
 
 val STYLE_BACKGROUND_COLOR = "#f6f1f9"
@@ -12,6 +13,7 @@ val STYLE_ACCENT_COLOR = "#ffc400"
 class MainStyleSheet : Stylesheet() {
     companion object {
         val toolBar by cssclass()
+        val settingLabel by cssclass()
     }
 
     init {
@@ -35,6 +37,12 @@ class MainStyleSheet : Stylesheet() {
             label {
                 textFill = c(STYLE_TOOLBAR_TEXT_COLOR)
             }
+        }
+
+        settingLabel {
+            fontFamily = "Roboto"
+            fontWeight = FontWeight.BOLD
+            padding = box(0.px, 20.px, 0.px, 0.px)
         }
     }
 

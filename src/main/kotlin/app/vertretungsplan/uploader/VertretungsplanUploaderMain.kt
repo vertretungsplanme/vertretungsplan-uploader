@@ -6,9 +6,15 @@ import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
 import javafx.scene.image.Image
 import javafx.stage.Stage
 import tornadofx.App
+import net.harawata.appdirs.AppDirsFactory
 
 class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) {
     var stage: Stage? = null
+
+    private val appDirs = AppDirsFactory.getInstance()!!
+    // Keep version argument at 1, we do not want new folders for every new version for now.
+    private val dataDir = appDirs.getUserDataDir("uploader", "1", "vertretungsplanapp")
+    val configStore = VertretungsplanUploaderPrefs(dataDir)
 
     override fun start(stage: Stage) {
         SvgImageLoaderFactory.install();
@@ -45,7 +51,6 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
         super.start(stage)
 
         val stylesheets = stage.scene.getStylesheets()
-        stylesheets.addAll(VertretungsplanUploaderMain::class.java.getResource("/css/jfoenix-fonts.css").toExternalForm(),
-                VertretungsplanUploaderMain::class.java.getResource("/css/jfoenix-design.css").toExternalForm())
+        stylesheets.addAll(resources["/css/jfoenix-fonts.css"], resources["/css/jfoenix-design.css"])
     }
 }
