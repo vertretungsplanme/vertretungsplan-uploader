@@ -6,12 +6,16 @@ import app.vertretungsplan.uploader.ui.style.MainStyleSheet
 import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import app.vertretungsplan.uploader.VertretungsplanUploaderMain
 import app.vertretungsplan.uploader.ui.helpers.jfxButton
+import app.vertretungsplan.uploader.ui.helpers.jfxTextfield
 import app.vertretungsplan.uploader.ui.style.STYLE_PRIMARY_DARK_COLOR
+import app.vertretungsplan.uploader.sync.SyncDaemon
+import app.vertretungsplan.uploader.ui.helpers.jfxPasswordfield
 import com.jfoenix.controls.JFXButton
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.scene.image.Image
+import javafx.scene.layout.BackgroundFill
 import javafx.stage.DirectoryChooser
 import tornadofx.*
 import java.io.File
@@ -21,6 +25,19 @@ class MainView : View() {
 
     val sourceDirProperty = SimpleStringProperty(configStore.sourceDir)
     var sourceDir by sourceDirProperty
+
+    val ftpServerField = jfxTextfield() {
+        useMaxWidth = true
+    }
+    val ftpUserField = jfxTextfield() {
+        useMaxWidth = true
+    }
+    val ftpPasswordField = jfxPasswordfield() {
+        useMaxWidth = true
+    }
+    val ftpPortField = jfxTextfield() {
+        useMaxWidth = true
+    }
 
     private val contentBox = vbox {
         useMaxHeight = true
@@ -53,9 +70,50 @@ class MainView : View() {
             }
         }
 
+        hbox {
+            useMaxWidth = true
+
+            label(messages["ftp_server"]) {
+                addClass(MainStyleSheet.settingLabel)
+            }
+            ftpServerField
+        }
+
+        hbox {
+            useMaxWidth = true
+
+            label(messages["ftp_user"]) {
+                addClass(MainStyleSheet.settingLabel)
+            }
+            ftpUserField
+        }
+
+        hbox {
+            useMaxWidth = true
+
+            label(messages["ftp_password"]) {
+                addClass(MainStyleSheet.settingLabel)
+            }
+            ftpPasswordField
+        }
+
+        hbox {
+            useMaxWidth = true
+
+            label(messages["ftp_port"]) {
+                addClass(MainStyleSheet.settingLabel)
+            }
+            ftpPortField
+        }
+
         jfxButton(messages["save"].toUpperCase()) {
             action {
                 configStore.sourceDir = sourceDir
+                configStore.ftpServer = ftpServerField.text
+                configStore.ftpUser = ftpUserField.text
+                configStore.ftpPassword = ftpPasswordField.text
+                configStore.ftpPort = ftpPortField.text.toInt()
+                SyncDaemon(app).run()
             }
         }
 
