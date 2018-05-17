@@ -7,6 +7,10 @@ import org.apache.commons.vfs2.tasks.SyncTask
 class SyncDaemon(app: Application): Thread() {
     private var configStore = (app as VertretungsplanUploaderMain).configStore
 
+    init {
+        isDaemon = true
+    }
+
     override fun run() {
         val destPath = "ftp://${configStore.ftpUser}:${configStore.ftpPassword}@${configStore
                 .ftpServer}:${configStore.ftpPort}/"
