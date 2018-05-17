@@ -7,16 +7,16 @@ import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import app.vertretungsplan.uploader.VertretungsplanUploaderMain
 import app.vertretungsplan.uploader.ui.helpers.jfxButton
 import app.vertretungsplan.uploader.ui.helpers.jfxTextfield
-import app.vertretungsplan.uploader.ui.style.STYLE_PRIMARY_DARK_COLOR
 import app.vertretungsplan.uploader.sync.SyncDaemon
 import app.vertretungsplan.uploader.ui.helpers.jfxPasswordfield
-import com.jfoenix.controls.JFXButton
-import javafx.beans.binding.Bindings
+import com.jfoenix.controls.JFXTextField
+import com.jfoenix.validation.NumberValidator
+import com.jfoenix.validation.RequiredFieldValidator
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ObservableValue
 import javafx.scene.image.Image
-import javafx.scene.layout.BackgroundFill
 import javafx.stage.DirectoryChooser
+import javafx.util.converter.NumberStringConverter
 import tornadofx.*
 import java.io.File
 
@@ -26,18 +26,17 @@ class MainView : View() {
     val sourceDirProperty = SimpleStringProperty(configStore.sourceDir)
     var sourceDir by sourceDirProperty
 
-    val ftpServerField = jfxTextfield() {
-        useMaxWidth = true
-    }
-    val ftpUserField = jfxTextfield() {
-        useMaxWidth = true
-    }
-    val ftpPasswordField = jfxPasswordfield() {
-        useMaxWidth = true
-    }
-    val ftpPortField = jfxTextfield() {
-        useMaxWidth = true
-    }
+    val ftpServerProperty = SimpleStringProperty(configStore.ftpServer)
+    var ftpServer by ftpServerProperty
+
+    val ftpUserProperty = SimpleStringProperty(configStore.ftpUser)
+    var ftpUser by ftpUserProperty
+
+    val ftpPasswordProperty = SimpleStringProperty(configStore.ftpPassword)
+    var ftpPassword by ftpPasswordProperty
+
+    val ftpPortProperty = SimpleIntegerProperty(configStore.ftpPort)
+    var ftpPort by ftpPortProperty
 
     private val contentBox = vbox {
         useMaxHeight = true
@@ -50,70 +49,72 @@ class MainView : View() {
             paddingRight = 20.0
         }
 
-        hbox {
-            style {
-                alignment = Pos.CENTER
-            }
+        val form = form {
+            fieldset {
+                field(messages["source_folder"]) {
+                    jfxTextfield(sourceDirProperty) {
+                        setValidators(RequiredFieldValidator())
+                        isDisable = true
+                    }
+                    spacer { }
+                    jfxButton(messages["choose_folder"].toUpperCase()) {
+                        action {
+                            val chooser = DirectoryChooser()
+                            chooser.title = messages["source_folder"]
+                            if (sourceDir != null) chooser.initialDirectory = File(sourceDir)
+                            sourceDir = chooser.showDialog(currentWindow)?.absolutePath ?: sourceDir
+                        }
+                    }
+                }
 
-            label(messages["source_folder"]) {
-                addClass(MainStyleSheet.settingLabel)
-            }
-            label(Bindings.`when`(sourceDirProperty.isNotNull).then(sourceDirProperty).otherwise(""))
-            spacer {}
-            jfxButton(messages["choose_folder"].toUpperCase()) {
-                action {
-                    val chooser = DirectoryChooser()
-                    chooser.title = messages["source_folder"]
-                    if (sourceDir != null) chooser.initialDirectory = File(sourceDir)
-                    sourceDir = chooser.showDialog(currentWindow)?.absolutePath ?: sourceDir
+                field(messages["ftp_server"]) {
+                    jfxTextfield(ftpServerProperty) {
+                        setValidators(RequiredFieldValidator())
+                    }
+                }
+
+                field(messages["ftp_user"]) {
+                    jfxTextfield(ftpUserProperty) {
+                        setValidators(RequiredFieldValidator())
+                    }
+                }
+
+                field(messages["ftp_password"]) {
+                    jfxPasswordfield(ftpPasswordProperty) {
+                        setValidators(RequiredFieldValidator())
+                    }
+                }
+
+                field(messages["ftp_port"]) {
+                    jfxTextfield {
+                        setValidators(NumberValidator())
+                        textProperty().bindBidirectional(ftpPortProperty,
+                                NumberStringConverter("##0"))
+                    }
                 }
             }
         }
 
-        hbox {
-            useMaxWidth = true
-
-            label(messages["ftp_server"]) {
-                addClass(MainStyleSheet.settingLabel)
-            }
-            ftpServerField
-        }
-
-        hbox {
-            useMaxWidth = true
-
-            label(messages["ftp_user"]) {
-                addClass(MainStyleSheet.settingLabel)
-            }
-            ftpUserField
-        }
-
-        hbox {
-            useMaxWidth = true
-
-            label(messages["ftp_password"]) {
-                addClass(MainStyleSheet.settingLabel)
-            }
-            ftpPasswordField
-        }
-
-        hbox {
-            useMaxWidth = true
-
-            label(messages["ftp_port"]) {
-                addClass(MainStyleSheet.settingLabel)
-            }
-            ftpPortField
-        }
-
         jfxButton(messages["save"].toUpperCase()) {
             action {
-                configStore.sourceDir = sourceDir
-                configStore.ftpServer = ftpServerField.text
-                configStore.ftpUser = ftpUserField.text
-                configStore.ftpPassword = ftpPasswordField.text
-                configStore.ftpPort = ftpPortField.text.toInt()
-                SyncDaemon(app).run()
+                var valid = (form.children[0] as Fieldset).children.map {
+                    if (it is Field) {
+                        val field = it.inputs[0]
+                        if (field is JFXTextField) {
+                            return@map field.validate()
+                        }
+                    }
+                    return@map true
+                }.all { it }
+
+                if (valid) {
+                    configStore.sourceDir = sourceDir
+                    configStore.ftpServer = ftpServer
+                    configStore.ftpUser = ftpUser
+                    configStore.ftpPassword = ftpPassword
+                    configStore.ftpPort = ftpPort
+                    SyncDaemon(app).run()
+                }
             }
         }
 

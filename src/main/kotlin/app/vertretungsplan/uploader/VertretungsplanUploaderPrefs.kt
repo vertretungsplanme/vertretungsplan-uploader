@@ -39,10 +39,10 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
             prefs.flush()
         }
 
-    var ftpPort: Int?
+    var ftpPort: Int
         get() = prefs.getInt(PREFS_KEY_FTP_PORT, 22)
         set (value) {
-            prefs.putInt(PREFS_KEY_FTP_PORT, value ?: 22)
+            prefs.putInt(PREFS_KEY_FTP_PORT, value)
             prefs.flush()
         }
 }

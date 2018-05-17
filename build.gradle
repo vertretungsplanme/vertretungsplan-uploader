@@ -39,7 +39,8 @@ dependencies {
     compile 'net.harawata:appdirs:1.0.0'
     compile 'net.java.dev.jna:platform:3.5.2'
     compile 'org.apache.commons:commons-vfs2:2.2'
-    compile group: 'org.apache.ant', name: 'ant', version: '1.10.3'
+    compile 'commons-httpclient:commons-httpclient:3.1'
+    compile 'commons-net:commons-net:3.6'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
