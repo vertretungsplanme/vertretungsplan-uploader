@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/vertretungsplanme/vertretungsplan-uploader.svg?branch=master)](https://travis-ci.org/vertretungsplanme/vertretungsplan-uploader)
 [![Build status](https://ci.appveyor.com/api/projects/status/uq4paoow43ktcwyc?svg=true)](https://ci.appveyor.com/project/johan12345/vertretungsplan-uploader)
+[![codecov](https://codecov.io/gh/vertretungsplanme/vertretungsplan-uploader/branch/master/graph/badge.svg)](https://codecov.io/gh/vertretungsplanme/vertretungsplan-uploader)
 
 <a href="https://vertretungsplan.app"><img style="vertical-align:middle" src="https://vertretungsplan.app/img/vertretungsplan_icon_color.svg" width=80/></a>
 
