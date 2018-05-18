@@ -105,7 +105,7 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
 
         stage.icons += Image(resources.stream("vertretungsplan_icon.svg"))
         stage.minHeight = 100.0
-        stage.minWidth = 800.0
+        stage.minWidth = 500.0
 
         daemon = SyncDaemon(this)
         super.start(stage)

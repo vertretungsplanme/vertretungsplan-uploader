@@ -1,13 +1,10 @@
 package app.vertretungsplan.uploader.ui
 
 import app.vertretungsplan.uploader.VertretungsplanUploaderMain
-import app.vertretungsplan.uploader.ui.helpers.jfxButton
-import app.vertretungsplan.uploader.ui.helpers.jfxPasswordfield
-import app.vertretungsplan.uploader.ui.helpers.jfxSpinner
-import app.vertretungsplan.uploader.ui.helpers.jfxTextfield
 import app.vertretungsplan.uploader.ui.style.MainStyleSheet
 import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import app.vertretungsplan.uploader.sync.Sync.Callback
+import app.vertretungsplan.uploader.ui.helpers.*
 import com.jfoenix.controls.JFXSpinner
 import com.jfoenix.controls.JFXTextField
 import com.jfoenix.validation.NumberValidator
@@ -52,6 +49,9 @@ class MainView : View() {
     val syncingProperty = SimpleBooleanProperty(false)
     var syncing by syncingProperty
 
+    val autostartProperty = SimpleBooleanProperty(false)
+    var autostart by autostartProperty
+
     init {
         (app as VertretungsplanUploaderMain).daemon!!.callback = object : Callback {
             override fun start() {
@@ -86,7 +86,7 @@ class MainView : View() {
         }
 
         val form = form {
-            fieldset {
+            fieldset(messages["group_source"]) {
                 field(messages["source_folder"]) {
                     jfxTextfield(sourceDirProperty) {
                         setValidators(RequiredFieldValidator())
@@ -102,7 +102,9 @@ class MainView : View() {
                         }
                     }
                 }
+            }
 
+            fieldset(messages["group_ftp"]) {
                 field(messages["ftp_server"]) {
                     jfxTextfield(ftpServerProperty) {
                         setValidators(RequiredFieldValidator())
@@ -127,6 +129,12 @@ class MainView : View() {
                         textProperty().bindBidirectional(ftpPortProperty,
                                 NumberStringConverter("##0"))
                     }
+                }
+            }
+
+            fieldset(messages["group_app_settings"]) {
+                field(messages["autostart"]) {
+                    jfxCheckbox()
                 }
             }
         }
