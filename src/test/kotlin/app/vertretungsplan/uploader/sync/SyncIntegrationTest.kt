@@ -20,6 +20,7 @@ class SyncIntegrationTest {
     @Before
     fun setUp() {
         server.addUserAccount(UserAccount("user", "password", baseDir))
+        server.serverControlPort = 0  // automatically select free port
         val fileSystem = WindowsFakeFileSystem()
         fileSystem.add(DirectoryEntry(baseDir))
         server.fileSystem = fileSystem
