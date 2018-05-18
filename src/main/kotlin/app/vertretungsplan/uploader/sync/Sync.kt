@@ -4,6 +4,7 @@ import org.apache.commons.vfs2.*
 import java.util.*
 import java.util.logging.Logger
 
+// based on https://sourceforge.net/p/vfs-utils/code/HEAD/tree/trunk/shell/core/src/main/java/org/vfsutils/shell/commands/Sync.java
 
 class Sync(val srcPath: String, val destPath: String, val delete: Boolean = true, val
 compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNewer: Boolean =

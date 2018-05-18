@@ -113,7 +113,7 @@ class MainView : View() {
                     configStore.ftpUser = ftpUser
                     configStore.ftpPassword = ftpPassword
                     configStore.ftpPort = ftpPort
-                    SyncDaemon(app).run()
+                    SyncDaemon(app).start()
                 }
             }
         }
