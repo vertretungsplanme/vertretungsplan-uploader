@@ -1,0 +1,11 @@
+stages:
+  - build
+
+build:
+    stage: build
+    script:
+        - GRADLE_USER_HOME=/cache ./gradlew check test build fatJar createExe
+    artifacts:
+        paths:
+            - build/launch4j/uploader.exe
+            - libs/uploader.jar
