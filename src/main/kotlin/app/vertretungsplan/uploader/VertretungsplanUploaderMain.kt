@@ -19,6 +19,7 @@ import tornadofx.*
 import java.awt.*
 import java.awt.event.ActionListener
 import java.util.*
+import javax.imageio.ImageIO
 
 
 val APP_ID = "app.vertretungsplan.uploader"
@@ -56,8 +57,7 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
         val tray = SystemTray.getSystemTray()
         val trayIconSize = tray.trayIconSize
         // load an image
-        var image = SwingFXUtils.fromFXImage(Image(resources.stream("vertretungsplan_icon.svg"),
-                trayIconSize.width.toDouble(), trayIconSize.height.toDouble(), true, true), null)
+        var image = ImageIO.read(resources.stream("vertretungsplan_icon_tray.png"))
 
         // create a action listener to listen for default action executed on the tray icon
         val closeListener = ActionListener { System.exit(0) }
