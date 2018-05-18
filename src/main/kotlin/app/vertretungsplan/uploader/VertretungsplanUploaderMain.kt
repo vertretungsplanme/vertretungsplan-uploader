@@ -1,5 +1,7 @@
 package app.vertretungsplan.uploader
 
+import app.vertretungsplan.uploader.sync.Sync
+import app.vertretungsplan.uploader.sync.SyncDaemon
 import app.vertretungsplan.uploader.ui.MainView
 import app.vertretungsplan.uploader.ui.style.MainStyleSheet
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
@@ -10,6 +12,7 @@ import net.harawata.appdirs.AppDirsFactory
 
 class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) {
     var stage: Stage? = null
+    var daemon: SyncDaemon? = null
 
     private val appDirs = AppDirsFactory.getInstance()!!
     // Keep version argument at 1, we do not want new folders for every new version for now.
@@ -19,6 +22,7 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
     override fun start(stage: Stage) {
         SvgImageLoaderFactory.install();
         this.stage = stage
+
         /*try {
             acquireLock(APP_ID, fun (message: String): String {
                 fire(ConfigureEvent(message))
@@ -46,11 +50,21 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
         }*/
 
         //stage.icons += Image(VertretungsplanUploaderMain::class.java.getResourceAsStream("icon.png"))
-        stage.minHeight = 600.0
+        stage.minHeight = 100.0
         stage.minWidth = 800.0
+
+        daemon = SyncDaemon(this)
         super.start(stage)
 
         val stylesheets = stage.scene.getStylesheets()
         stylesheets.addAll(resources["/css/jfoenix-fonts.css"], resources["/css/jfoenix-design.css"])
+
+        daemon!!.start()
+    }
+
+    fun restartDaemon() {
+        daemon!!.interrupt()
+        daemon = SyncDaemon(this)
+        daemon!!.start()
     }
 }

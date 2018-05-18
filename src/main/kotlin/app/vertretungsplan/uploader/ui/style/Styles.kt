@@ -37,6 +37,11 @@ class MainStyleSheet : Stylesheet() {
             label {
                 textFill = c(STYLE_TOOLBAR_TEXT_COLOR)
             }
+
+            select("JFXSpinner .arc") {
+                stroke = c("#FFFFFF")
+                strokeWidth = 4.px
+            }
         }
 
         settingLabel {

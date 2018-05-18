@@ -8,7 +8,7 @@ import java.util.logging.Logger
 
 class Sync(val srcPath: String, val destPath: String, val delete: Boolean = true, val
 compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNewer: Boolean =
-        true, val preserveLastModified: Boolean = true) {
+        true, val preserveLastModified: Boolean = true, val callback: Callback = DummyCallback()) {
     protected var cntFiles = 0
     protected var cntSyncFiles = 0
     protected var cntDirs = 0
@@ -16,20 +16,39 @@ compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNe
     protected var cntRemoved = 0
     protected val logger = Logger.getLogger("Sync")
 
+    interface Callback {
+        fun start()
+        fun newFile(file: String)
+        fun end()
+    }
+
+    private class DummyCallback : Callback {
+        override fun start() {
+        }
+
+        override fun newFile(file: String) {
+        }
+
+        override fun end() {
+        }
+    }
+
     fun run() {
+        callback.start()
+
         val man = VFS.getManager()
         val src = man.resolveFile(srcPath)
         val dest = man.resolveFile(destPath)
 
-        if (src.getType().equals(FileType.FILE)) {
-            if (dest.getType().equals(FileType.FOLDER)) {
-                val imaginaryDest = dest.resolveFile(src.getName().getBaseName())
+        if (src.type == FileType.FILE) {
+            if (dest.type == FileType.FOLDER) {
+                val imaginaryDest = dest.resolveFile(src.name.baseName)
                 syncFiles(src, imaginaryDest)
             } else {
                 syncFiles(src, dest)
             }
-        } else if (src.getType().equals(FileType.FOLDER)) {
-            if (dest.getType().equals(FileType.FILE)) {
+        } else if (src.type == FileType.FOLDER) {
+            if (dest.type == FileType.FILE) {
                 throw IllegalArgumentException("You cannot synchronize a folder with a file")
             } else {
                 // do not count the starting dir
@@ -37,11 +56,14 @@ compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNe
                 syncDirs(src, dest)
             }
         }
+
+        callback.end()
     }
 
     fun syncFiles(srcFile: FileObject, destFile: FileObject) {
         cntFiles++
         if (!areSame(srcFile, destFile)) {
+            callback.newFile(srcFile.name.baseName)
             syncFileAction(srcFile, destFile)
             cntSyncFiles++
         }
@@ -54,7 +76,7 @@ compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNe
             syncDirAction(srcDir, destDir)
             cntSyncDirs++
         } else {
-            val tmpDestChildren = destDir.getChildren()
+            val tmpDestChildren = destDir.children
             //create list of destChildren
             for (i in tmpDestChildren.indices) {
                 destChildren.add(tmpDestChildren[i])
@@ -62,27 +84,27 @@ compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNe
         }
 
         //spider through the children
-        val srcChildren = srcDir.getChildren()
+        val srcChildren = srcDir.children
 
         for (i in srcChildren.indices) {
             val srcChild = srcChildren[i]
-            val destChild = destDir.resolveFile(srcChild.getName().getBaseName(), NameScope.CHILD)
+            val destChild = destDir.resolveFile(srcChild.name.baseName, NameScope.CHILD)
             destChildren.remove(destChild)
 
             //if delete, remove destChild in case of type conflict
             if (delete) {
-                if (destChild.exists() && !srcChild.getType().equals(destChild.getType())) {
+                if (destChild.exists() && !srcChild.type.equals(destChild.type)) {
                     cntRemoved += typeConflictAction(srcChild, destChild)
                 }
             }
 
             //both are files (dest can be imaginary)
-            if (!srcChild.getType().equals(FileType.FOLDER) && !destChild.getType().equals(FileType.FOLDER)) {
+            if (srcChild.type != FileType.FOLDER && destChild.type != FileType.FOLDER) {
                 syncFiles(srcChild, destChild)
             }
 
             //both are folders (dest can be imaginary)
-            if (!srcChild.getType().equals(FileType.FILE) && !destChild.getType().equals(FileType.FILE)) {
+            if (srcChild.type != FileType.FILE && destChild.type != FileType.FILE) {
                 syncDirs(srcChild, destChild)
             }
 
@@ -93,7 +115,7 @@ compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNe
 
         if (delete) {
             for (i in destChildren.indices) {
-                val remainingChild = destChildren.get(i) as FileObject
+                val remainingChild = destChildren.get(i)
                 cntRemoved += remainingChildAction(remainingChild)
             }
         }

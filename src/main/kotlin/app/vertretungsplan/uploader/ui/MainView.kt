@@ -1,20 +1,28 @@
 package app.vertretungsplan.uploader.ui
 
-import javafx.geometry.Pos
-import javafx.scene.layout.StackPane
-import app.vertretungsplan.uploader.ui.style.MainStyleSheet
-import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import app.vertretungsplan.uploader.VertretungsplanUploaderMain
 import app.vertretungsplan.uploader.ui.helpers.jfxButton
-import app.vertretungsplan.uploader.ui.helpers.jfxTextfield
-import app.vertretungsplan.uploader.sync.SyncDaemon
 import app.vertretungsplan.uploader.ui.helpers.jfxPasswordfield
+import app.vertretungsplan.uploader.ui.helpers.jfxSpinner
+import app.vertretungsplan.uploader.ui.helpers.jfxTextfield
+import app.vertretungsplan.uploader.ui.style.MainStyleSheet
+import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
+import app.vertretungsplan.uploader.sync.Sync.Callback
+import com.jfoenix.controls.JFXSpinner
 import com.jfoenix.controls.JFXTextField
 import com.jfoenix.validation.NumberValidator
 import com.jfoenix.validation.RequiredFieldValidator
+import javafx.application.Platform
+import javafx.beans.binding.Bindings
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.geometry.Pos
+import javafx.scene.control.ContentDisplay
 import javafx.scene.image.Image
+import javafx.scene.layout.StackPane
+import javafx.scene.text.TextAlignment
 import javafx.stage.DirectoryChooser
 import javafx.util.converter.NumberStringConverter
 import tornadofx.*
@@ -38,6 +46,33 @@ class MainView : View() {
     val ftpPortProperty = SimpleIntegerProperty(configStore.ftpPort)
     var ftpPort by ftpPortProperty
 
+    val statusProperty = SimpleStringProperty("")
+    var status by statusProperty
+
+    val syncingProperty = SimpleBooleanProperty(false)
+    var syncing by syncingProperty
+
+    init {
+        (app as VertretungsplanUploaderMain).daemon!!.callback = object : Callback {
+            override fun start() {
+                Platform.runLater {
+                    syncing = true
+                }
+            }
+
+            override fun newFile(file: String) {
+                Platform.runLater { status = messages["syncing"].format(file) }
+            }
+
+            override fun end() {
+                Platform.runLater {
+                    syncing = false
+                    status = ""
+                }
+            }
+        }
+    }
+
     private val contentBox = vbox {
         useMaxHeight = true
 
@@ -47,6 +82,7 @@ class MainView : View() {
             spacing = 20.px
             paddingLeft = 20.0
             paddingRight = 20.0
+            paddingBottom = 20.0
         }
 
         val form = form {
@@ -113,7 +149,7 @@ class MainView : View() {
                     configStore.ftpUser = ftpUser
                     configStore.ftpPassword = ftpPassword
                     configStore.ftpPort = ftpPort
-                    SyncDaemon(app).start()
+                    (app as VertretungsplanUploaderMain).restartDaemon()
                 }
             }
         }
@@ -124,16 +160,24 @@ class MainView : View() {
         vbox {
             useMaxHeight = true
 
-            gridpane {
+            hbox {
                 addClass(MainStyleSheet.toolBar)
-                style {
-                    minWidth = 100.percent
-                }
-                row {
-                    hbox {
-                        imageview(Image(resources.stream("vertretungsplan_logo.svg"), 0.0, 32.0, true, false))
+
+                useMaxWidth = true
+
+                imageview(Image(resources.stream("vertretungsplan_logo.svg"), 198.0, 32.0, true,
+                        false))
+                spacer { }
+                label(statusProperty) {
+                    style {
+                        minWidth = 200.px
+                        alignment = Pos.CENTER_RIGHT
+                        paddingRight = 16.0
                     }
-                    spacer { }
+                }
+                jfxSpinner(SimpleDoubleProperty(JFXSpinner.INDETERMINATE_PROGRESS)) {
+                    visibleWhen(syncingProperty)
+                    radius = 10.0
                 }
             }
 
@@ -142,5 +186,9 @@ class MainView : View() {
             spacer { }
 
         }
+    }
+
+    override fun onUndock() {
+        (app as VertretungsplanUploaderMain).daemon!!.callback = null
     }
 }
