@@ -28,6 +28,11 @@ import org.apache.commons.vfs2.FileObject
 import org.apache.commons.vfs2.VFS
 import tornadofx.*
 import java.io.File
+import com.sun.jna.platform.win32.Netapi32Util.User
+import javafx.scene.control.TreeTableColumn
+import com.jfoenix.controls.JFXTreeTableColumn
+import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject
+
 
 class MainView : View() {
     private var configStore = (app as VertretungsplanUploaderMain).configStore
@@ -165,8 +170,9 @@ class MainView : View() {
 
                             val dialog = JFXDialog()
                             dialog.content = JFXTreeTableView<FileInfo>().apply {
-                                column("Name", FileInfo::toString)
-                                root = TreeItem(FileInfo(dest))
+                                column("Name", FileInfo::getName)
+                                root = RecursiveTreeItem<FileInfo>(FileInfo(dest),
+                                        RecursiveTreeObject<FileInfo>::getChildren)
                                 root.isExpanded = true
                                 resizeColumnsToFitContent()
                             }
