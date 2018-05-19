@@ -49,8 +49,8 @@ class SyncDaemon(app: Application, var callback: Sync.Callback? = null): Thread(
 
     private fun sync() {
         try {
-            val destPath = "ftp://${configStore.ftpUser}:${configStore.ftpPassword}@${configStore
-                    .ftpServer}:${configStore.ftpPort}/"
+            val destPath = "${configStore.protocol.toLowerCase()}://${configStore.ftpUser}:" +
+                    "${configStore.ftpPassword}@${configStore.ftpServer}:${configStore.ftpPort}/"
             if (callback != null) {
                 Sync(configStore.sourceDir!!, destPath, callback = callback!!).run()
             } else {

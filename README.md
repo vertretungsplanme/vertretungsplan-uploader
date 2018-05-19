@@ -10,7 +10,8 @@ What is this?
 -------------
 
 This is a cross-platform desktop application that allows schools to upload their substitution schedules (Vertretungsplan
- / Supplierplan) to a web server. Currently, only the FTP protocol is implemented, but others (e.g. SFTP) can easily be
+ / Supplierplan) to a web server. Currently, the FTP, SFTP and FTPS (FTP over TLS) protocols are implemented, others
+supported by [Apache VFS](https://commons.apache.org/proper/commons-vfs/filesystems.html) could easily be
  added. It is intended to be used together with our [mobile app](https://vertretungsplan.app/) that can fetch the
  schedules from the school's server. In the future, we will add an option to notify our server when the school has
  updated their schedule, so that changes are reflected in the app instantly.

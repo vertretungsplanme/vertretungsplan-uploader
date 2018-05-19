@@ -6,6 +6,7 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
     private val prefs = Preferences.userNodeForPackage(VertretungsplanUploaderPrefs::class.java)
 
     private val PREFS_KEY_SOURCE_DIR = "source_dir"
+    private val PREFS_KEY_PROTOCOL = "protocol"
     private val PREFS_KEY_FTP_SERVER = "ftp_server"
     private val PREFS_KEY_FTP_USER = "ftp_user"
     private val PREFS_KEY_FTP_PASSWORD = "ftp_password"
@@ -22,6 +23,13 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
         get() = prefs.get(PREFS_KEY_FTP_SERVER, null)
         set (value) {
             prefs.put(PREFS_KEY_FTP_SERVER, value)
+            prefs.flush()
+        }
+
+    var protocol: String
+        get() = prefs.get(PREFS_KEY_PROTOCOL, "FTP")
+        set (value) {
+            prefs.put(PREFS_KEY_PROTOCOL, value)
             prefs.flush()
         }
 

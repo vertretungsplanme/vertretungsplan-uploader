@@ -3,6 +3,7 @@ package app.vertretungsplan.uploader.ui.helpers
 import com.jfoenix.controls.*
 import javafx.beans.property.Property
 import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
 import javafx.event.EventTarget
 import javafx.geometry.Orientation
 import javafx.scene.Node
@@ -75,6 +76,11 @@ fun EventTarget.jfxDatepicker(v: LocalDate? = null, op: (JFXDatePicker.() -> Uni
     this.converter = LocalDateStringConverter(FormatStyle.SHORT, FX.locale, null)
 }
 fun EventTarget.jfxDatepicker(property: Property<LocalDate>, op: (JFXDatePicker.() -> Unit) = {}) = jfxDatepicker().apply {
+    bind(property)
+    op.invoke(this)
+}
+
+fun EventTarget.jfxComboBox(property: Property<String>, items: ObservableList<String>, op: (JFXComboBox<String>.() -> Unit) = {}) = opcr(this, JFXComboBox(items), op).apply {
     bind(property)
     op.invoke(this)
 }

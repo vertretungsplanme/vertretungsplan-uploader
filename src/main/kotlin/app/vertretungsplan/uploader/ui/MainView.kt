@@ -31,6 +31,9 @@ class MainView : View() {
     val sourceDirProperty = SimpleStringProperty(configStore.sourceDir)
     var sourceDir by sourceDirProperty
 
+    val protocolProperty = SimpleStringProperty(configStore.protocol)
+    val protocol by protocolProperty
+
     val ftpServerProperty = SimpleStringProperty(configStore.ftpServer)
     var ftpServer by ftpServerProperty
 
@@ -105,6 +108,10 @@ class MainView : View() {
             }
 
             fieldset(messages["group_ftp"]) {
+                field(messages["ftp_protocol"]) {
+                    jfxComboBox(protocolProperty, observableList("FTP", "FTPS", "SFTP"))
+                }
+
                 field(messages["ftp_server"]) {
                     jfxTextfield(ftpServerProperty) {
                         setValidators(RequiredFieldValidator())
@@ -141,7 +148,7 @@ class MainView : View() {
 
         jfxButton(messages["save"].toUpperCase()) {
             action {
-                var valid = (form.children[0] as Fieldset).children.map {
+                val valid = (form.children[0] as Fieldset).children.map {
                     if (it is Field) {
                         val field = it.inputs[0]
                         if (field is JFXTextField) {
@@ -153,6 +160,7 @@ class MainView : View() {
 
                 if (valid) {
                     configStore.sourceDir = sourceDir
+                    configStore.protocol = protocol
                     configStore.ftpServer = ftpServer
                     configStore.ftpUser = ftpUser
                     configStore.ftpPassword = ftpPassword
