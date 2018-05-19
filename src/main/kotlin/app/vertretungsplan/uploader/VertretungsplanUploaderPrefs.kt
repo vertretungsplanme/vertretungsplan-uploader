@@ -11,6 +11,7 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
     private val PREFS_KEY_FTP_USER = "ftp_user"
     private val PREFS_KEY_FTP_PASSWORD = "ftp_password"
     private val PREFS_KEY_FTP_PORT = "ftp_port"
+    private val PREFS_KEY_FTP_DIR = "ftp_dir"
 
     var sourceDir: String?
         get() = prefs.get(PREFS_KEY_SOURCE_DIR, null)
@@ -48,9 +49,20 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
         }
 
     var ftpPort: Int
-        get() = prefs.getInt(PREFS_KEY_FTP_PORT, 22)
+        get() = prefs.getInt(PREFS_KEY_FTP_PORT, 21)
         set (value) {
             prefs.putInt(PREFS_KEY_FTP_PORT, value)
             prefs.flush()
         }
+
+    var ftpDir: String
+        get() = prefs.get(PREFS_KEY_FTP_DIR, "")
+        set (value) {
+            prefs.put(PREFS_KEY_FTP_DIR, value)
+            prefs.flush()
+        }
+
+    val destUrl: String?
+        get() = if (ftpUser != null && ftpPassword != null && ftpServer != null)
+            "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/" else null
 }

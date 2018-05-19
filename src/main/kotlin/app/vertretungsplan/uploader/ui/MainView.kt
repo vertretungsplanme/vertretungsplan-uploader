@@ -1,12 +1,12 @@
 package app.vertretungsplan.uploader.ui
 
 import app.vertretungsplan.uploader.VertretungsplanUploaderMain
+import app.vertretungsplan.uploader.sync.FileInfo
 import app.vertretungsplan.uploader.ui.style.MainStyleSheet
 import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import app.vertretungsplan.uploader.sync.Sync.Callback
 import app.vertretungsplan.uploader.ui.helpers.*
-import com.jfoenix.controls.JFXSpinner
-import com.jfoenix.controls.JFXTextField
+import com.jfoenix.controls.*
 import com.jfoenix.validation.NumberValidator
 import com.jfoenix.validation.RequiredFieldValidator
 import javafx.application.Platform
@@ -15,13 +15,17 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ChangeListener
 import javafx.geometry.Pos
 import javafx.scene.control.ContentDisplay
+import javafx.scene.control.TreeItem
 import javafx.scene.image.Image
 import javafx.scene.layout.StackPane
 import javafx.scene.text.TextAlignment
 import javafx.stage.DirectoryChooser
 import javafx.util.converter.NumberStringConverter
+import org.apache.commons.vfs2.FileObject
+import org.apache.commons.vfs2.VFS
 import tornadofx.*
 import java.io.File
 
@@ -45,6 +49,9 @@ class MainView : View() {
 
     val ftpPortProperty = SimpleIntegerProperty(configStore.ftpPort)
     var ftpPort by ftpPortProperty
+
+    val ftpDirProperty = SimpleStringProperty(configStore.ftpDir)
+    var ftpDir by ftpDirProperty
 
     val statusProperty = SimpleStringProperty("")
     var status by statusProperty
@@ -74,6 +81,14 @@ class MainView : View() {
                 }
             }
         }
+
+        protocolProperty.addListener { _, _, new ->
+            ftpPort = when (new) {
+                "FTP", "FTPS" -> 21
+                "SFTP" -> 22
+                else -> 0
+            }
+        }
     }
 
     private val contentBox = vbox {
@@ -98,10 +113,8 @@ class MainView : View() {
                     spacer { }
                     jfxButton(messages["choose_folder"].toUpperCase()) {
                         action {
-                            val chooser = DirectoryChooser()
-                            chooser.title = messages["source_folder"]
-                            if (sourceDir != null) chooser.initialDirectory = File(sourceDir)
-                            sourceDir = chooser.showDialog(currentWindow)?.absolutePath ?: sourceDir
+                            val initDir = if (sourceDir != null) File(sourceDir) else null
+                            sourceDir = chooseDirectory(messages["source_folder"], initDir)?.absolutePath ?: sourceDir
                         }
                     }
                 }
@@ -137,6 +150,30 @@ class MainView : View() {
                                 NumberStringConverter("##0"))
                     }
                 }
+
+                field(messages["ftp_folder"]) {
+                    jfxTextfield(ftpDirProperty) {
+                        setValidators(RequiredFieldValidator())
+                        isDisable = true
+                    }
+                    spacer { }
+                    jfxButton(messages["choose_folder"].toUpperCase()) {
+                        action {
+                            val man = VFS.getManager()
+                            val url = "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/"
+                            val dest = man.resolveFile(url)
+
+                            val dialog = JFXDialog()
+                            dialog.content = JFXTreeTableView<FileInfo>().apply {
+                                column("Name", FileInfo::toString)
+                                root = TreeItem(FileInfo(dest))
+                                root.isExpanded = true
+                                resizeColumnsToFitContent()
+                            }
+                            dialog.show(root)
+                        }
+                    }
+                }
             }
 
             fieldset(messages["group_app_settings"]) {
@@ -165,6 +202,7 @@ class MainView : View() {
                     configStore.ftpUser = ftpUser
                     configStore.ftpPassword = ftpPassword
                     configStore.ftpPort = ftpPort
+                    configStore.ftpDir = ftpDir
                     (app as VertretungsplanUploaderMain).restartDaemon()
                 }
             }

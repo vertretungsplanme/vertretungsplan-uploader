@@ -18,8 +18,7 @@ class SyncDaemon(app: Application, var callback: Sync.Callback? = null): Thread(
     private val FREQUENCY = 1000L
 
     override fun run() {
-        if (configStore.ftpUser != null && configStore.ftpPassword != null && configStore
-                        .ftpServer != null) {
+        if (configStore.destUrl != null) {
             val watcher = FileSystems.getDefault().newWatchService()
             val source = FileSystems.getDefault().getPath(configStore.sourceDir!!)
             source.register(watcher, arrayOf(ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), ExtendedWatchEventModifier.FILE_TREE)
@@ -49,8 +48,7 @@ class SyncDaemon(app: Application, var callback: Sync.Callback? = null): Thread(
 
     private fun sync() {
         try {
-            val destPath = "${configStore.protocol.toLowerCase()}://${configStore.ftpUser}:" +
-                    "${configStore.ftpPassword}@${configStore.ftpServer}:${configStore.ftpPort}/"
+            val destPath = configStore.destUrl!!
             if (callback != null) {
                 Sync(configStore.sourceDir!!, destPath, callback = callback!!).run()
             } else {
