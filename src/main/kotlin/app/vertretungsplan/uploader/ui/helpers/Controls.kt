@@ -1,12 +1,15 @@
 package app.vertretungsplan.uploader.ui.helpers
 
 import com.jfoenix.controls.*
+import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject
 import javafx.beans.property.Property
 import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
 import javafx.event.EventTarget
 import javafx.geometry.Orientation
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.control.cell.TreeItemPropertyValueFactory
 import javafx.scene.paint.Color
 import javafx.util.StringConverter
 import javafx.util.converter.LocalDateStringConverter
@@ -15,6 +18,7 @@ import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.FormatStyle
+import kotlin.reflect.KFunction
 
 
 enum class ColorPickerMode { Button, MenuButton, SplitMenuButton }
@@ -75,6 +79,11 @@ fun EventTarget.jfxDatepicker(v: LocalDate? = null, op: (JFXDatePicker.() -> Uni
     this.converter = LocalDateStringConverter(FormatStyle.SHORT, FX.locale, null)
 }
 fun EventTarget.jfxDatepicker(property: Property<LocalDate>, op: (JFXDatePicker.() -> Unit) = {}) = jfxDatepicker().apply {
+    bind(property)
+    op.invoke(this)
+}
+
+fun EventTarget.jfxComboBox(property: Property<String>, items: ObservableList<String>, op: (JFXComboBox<String>.() -> Unit) = {}) = opcr(this, JFXComboBox(items), op).apply {
     bind(property)
     op.invoke(this)
 }
@@ -197,3 +206,22 @@ fun Node.jfxRadiobutton(text: String? = null, group: ToggleGroup? = getToggleGro
     properties["tornadofx.toggleGroupValue"] = value ?: text
     if (group != null) toggleGroup = group
 }, op)
+
+
+fun <S: RecursiveTreeObject<S>, T> JFXTreeTableView<S>.column(title: String, propertyName: String, op: JFXTreeTableColumn<S, T>.() -> Unit = {}): JFXTreeTableColumn<S, T> {
+    val column = JFXTreeTableColumn<S, T>(title)
+    column.cellValueFactory = TreeItemPropertyValueFactory<S, T>(propertyName)
+    addColumnInternal(column)
+    return column.also(op)
+}
+
+/**
+ * Create a column using the getter of the attribute you want shown.
+ */
+@JvmName("pojoColumn")
+fun <S: RecursiveTreeObject<S>, T> JFXTreeTableView<S>.column(title: String, getter: KFunction<T>):
+        JFXTreeTableColumn<S, T> {
+    val startIndex = if (getter.name.startsWith("is") && getter.name[2].isUpperCase()) 2 else 3
+    val propName = getter.name.substring(startIndex).decapitalize()
+    return this.column(title, propName)
+}
