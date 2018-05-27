@@ -32,6 +32,8 @@ import com.sun.jna.platform.win32.Netapi32Util.User
 import javafx.scene.control.TreeTableColumn
 import com.jfoenix.controls.JFXTreeTableColumn
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject
+import javafx.scene.control.TreeTableView
+import javafx.scene.image.ImageView
 
 
 class MainView : View() {
@@ -169,12 +171,30 @@ class MainView : View() {
                             val dest = man.resolveFile(url)
 
                             val dialog = JFXDialog()
-                            dialog.content = JFXTreeTableView<FileInfo>().apply {
-                                column("Name", FileInfo::getName)
-                                root = RecursiveTreeItem<FileInfo>(FileInfo(dest),
-                                        RecursiveTreeObject<FileInfo>::getChildren)
-                                root.isExpanded = true
-                                resizeColumnsToFitContent()
+                            dialog.content = vbox {
+                                val treetable = TreeTableView<FileInfo>().apply {
+                                    column("Name", FileInfo::getName)
+                                    root = RecursiveTreeItem<FileInfo>(FileInfo(dest, true),
+                                            RecursiveTreeObject<FileInfo>::getChildren)
+                                    root.isExpanded = true
+                                    resizeColumnsToFitContent()
+                                }
+                                this.add(treetable)
+                                hbox {
+                                    jfxButton(messages["ok"]) {
+                                        action {
+                                            if (treetable.selectedItem != null) {
+                                                ftpDir = treetable.selectedItem!!.file.name.path
+                                                dialog.close()
+                                            }
+                                        }
+                                    }
+                                    jfxButton(messages["cancel"]) {
+                                        action {
+                                            dialog.close()
+                                        }
+                                    }
+                                }
                             }
                             dialog.show(root)
                         }

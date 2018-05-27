@@ -211,7 +211,7 @@ fun Node.jfxRadiobutton(text: String? = null, group: ToggleGroup? = getToggleGro
 fun <S: RecursiveTreeObject<S>, T> JFXTreeTableView<S>.column(title: String, propertyName: String, op: JFXTreeTableColumn<S, T>.() -> Unit = {}): JFXTreeTableColumn<S, T> {
     val column = JFXTreeTableColumn<S, T>(title)
     column.cellValueFactory = TreeItemPropertyValueFactory<S, T>(propertyName)
-    addColumnInternal(column)
+    columns.add(column)
     return column.also(op)
 }
 

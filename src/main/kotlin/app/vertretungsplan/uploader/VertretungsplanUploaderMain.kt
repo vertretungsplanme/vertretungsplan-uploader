@@ -11,6 +11,7 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.embed.swing.SwingFXUtils
 import javafx.event.EventHandler
+import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
@@ -20,6 +21,9 @@ import java.awt.*
 import java.awt.event.ActionListener
 import java.util.*
 import javax.imageio.ImageIO
+import com.jfoenix.controls.JFXDecorator
+
+
 
 
 val APP_ID = "app.vertretungsplan.uploader"

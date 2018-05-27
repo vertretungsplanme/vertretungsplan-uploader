@@ -64,5 +64,5 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
 
     val destUrl: String?
         get() = if (ftpUser != null && ftpPassword != null && ftpServer != null)
-            "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/" else null
+            "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/$ftpDir" else null
 }
