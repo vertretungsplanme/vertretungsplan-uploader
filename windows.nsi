@@ -10,12 +10,12 @@
  RequestExecutionLevel admin
 
  !define MUI_ABORTWARNING
- !define MUI_ICON "..\img\icon_on_shape.ico"
- !define MUI_WELCOMEFINISHPAGE_BITMAP "..\img\installer.bmp"
- !define MUI_UNWELCOMEFINISHPAGE_BITMAP "..\img\installer.bmp"
+ !define MUI_ICON "img\icon.ico"
+ !define MUI_WELCOMEFINISHPAGE_BITMAP "img\installer2x.bmp"
+ !define MUI_UNWELCOMEFINISHPAGE_BITMAP "img\installer2x.bmp"
 
  !insertmacro MUI_PAGE_WELCOME
- !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
+ !insertmacro MUI_PAGE_LICENSE "LICENSE"
  !insertmacro MUI_PAGE_COMPONENTS
  !insertmacro MUI_PAGE_DIRECTORY
  !insertmacro MUI_PAGE_INSTFILES
@@ -28,6 +28,7 @@
 
 
  !insertmacro MUI_LANGUAGE "English"
+ !insertmacro MUI_LANGUAGE "German"
 
  Section "vertretungsplan-uploader" SecBase
    SetOutPath "$INSTDIR"
@@ -42,15 +43,6 @@
 
    ;Store installation folder
    WriteRegStr HKCU "Software\vertretungsplan-uploader" "" $INSTDIR
-
-   DetailPrint "Register vertretungsplan-uploader URI Handler"
-   DeleteRegKey HKCR "vertretungsplan-uploader"
-   WriteRegStr HKCR "vertretungsplan-uploader" "" "URL: vertretungsplan-uploader"
-   WriteRegStr HKCR "vertretungsplan-uploader" "URL Protocol" "vertretungsplan-uploader setup URLs"
-   WriteRegStr HKCR "vertretungsplan-uploader\DefaultIcon" "" "$INSTDIR\vertretungsplan-uploader.exe"
-   WriteRegStr HKCR "vertretungsplan-uploader\shell" "" ""
-   WriteRegStr HKCR "vertretungsplan-uploader\shell\Open" "" ""
-   WriteRegStr HKCR "vertretungsplan-uploader\shell\Open\command" "" "$INSTDIR\vertretungsplan-uploader.exe %1"
 
    ;Create uninstaller
    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\vertretungsplan-uploader" "DisplayName" "vertretungsplan-uploader"
