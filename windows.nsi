@@ -13,6 +13,8 @@
  !define MUI_ICON "img\icon.ico"
  !define MUI_WELCOMEFINISHPAGE_BITMAP "img\installer2x.bmp"
  !define MUI_UNWELCOMEFINISHPAGE_BITMAP "img\installer2x.bmp"
+ 
+ ManifestDPIAware true
 
  !insertmacro MUI_PAGE_WELCOME
  !insertmacro MUI_PAGE_LICENSE "LICENSE"
