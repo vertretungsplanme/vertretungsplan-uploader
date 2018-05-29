@@ -4,14 +4,16 @@ import app.vertretungsplan.uploader.sync.SyncDaemon
 import app.vertretungsplan.uploader.ui.MainView
 import app.vertretungsplan.uploader.ui.style.MainStyleSheet
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
+import io.sentry.DefaultSentryClientFactory
+import io.sentry.Sentry
+import io.sentry.SentryUncaughtExceptionHandler
+import io.sentry.dsn.Dsn
 import it.sauronsoftware.junique.AlreadyLockedException
 import it.sauronsoftware.junique.JUnique
 import it.sauronsoftware.junique.JUnique.acquireLock
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
-import javafx.embed.swing.SwingFXUtils
 import javafx.event.EventHandler
-import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
@@ -19,11 +21,9 @@ import net.harawata.appdirs.AppDirsFactory
 import tornadofx.*
 import java.awt.*
 import java.awt.event.ActionListener
+import java.io.FileInputStream
 import java.util.*
 import javax.imageio.ImageIO
-import com.jfoenix.controls.JFXDecorator
-
-
 
 
 val APP_ID = "app.vertretungsplan.uploader"
@@ -56,14 +56,21 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
         set(value) = _messages.set(value)
 
     init {
-        SvgImageLoaderFactory.install();
-        // get the SystemTray instance
-        val tray = SystemTray.getSystemTray()
-        val trayIconSize = tray.trayIconSize
-        // load an image
-        var image = ImageIO.read(resources.stream("vertretungsplan_icon_tray.png"))
+        val buildInfo = BuildInfo()
+        if (buildInfo.release) {
+            Sentry.init(object : DefaultSentryClientFactory() {
+                override fun getRelease(dsn: Dsn?): String {
+                    return buildInfo.version
+                }
+            })
+            SentryUncaughtExceptionHandler.setup();
+        }
 
-        // create a action listener to listen for default action executed on the tray icon
+        SvgImageLoaderFactory.install();
+
+        // set up tray icon
+        val tray = SystemTray.getSystemTray()
+        var image = ImageIO.read(resources.stream("vertretungsplan_icon_tray.png"))
         val closeListener = ActionListener { System.exit(0) }
 
         val showListener = ActionListener {
@@ -72,7 +79,6 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
                 stage!!.isIconified = false
             }
         }
-        // create a popup menu
         val popup = PopupMenu()
 
         val showItem = MenuItem(messages["settings"])
@@ -82,13 +88,9 @@ class VertretungsplanUploaderMain : App(MainView::class, MainStyleSheet::class) 
         val closeItem = MenuItem(messages["exit"])
         closeItem.addActionListener(closeListener)
         popup.add(closeItem)
-        /// ... add other items
-        // construct a TrayIcon
+
         trayIcon = TrayIcon(image!!, messages["app_name"], popup)
-        // set the TrayIcon properties
         trayIcon.addActionListener(showListener)
-        // ...
-        // add the tray image
         try {
             tray.add(trayIcon)
         } catch (e: AWTException) {

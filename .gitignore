@@ -13,6 +13,8 @@ jre/
 # Local configuration file (sdk path, etc)
 local.properties
 ant.properties
+sentry.properties
+buildInfo.properties
 
 .classpath
 .project
