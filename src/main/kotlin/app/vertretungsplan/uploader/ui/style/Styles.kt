@@ -1,6 +1,8 @@
 package app.vertretungsplan.uploader.ui.style
 
+import com.jfoenix.controls.JFXButton
 import javafx.geometry.Pos
+import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import tornadofx.*
 
@@ -14,6 +16,9 @@ class MainStyleSheet : Stylesheet() {
     companion object {
         val toolBar by cssclass()
         val settingLabel by cssclass()
+        val raisedButton by cssclass()
+
+        val buttonType by cssproperty<JFXButton.ButtonType>("-jfx-button-type")
     }
 
     init {
@@ -48,6 +53,12 @@ class MainStyleSheet : Stylesheet() {
             fontFamily = "Roboto"
             fontWeight = FontWeight.BOLD
             padding = box(0.px, 20.px, 0.px, 0.px)
+        }
+
+        raisedButton {
+            buttonType.value = JFXButton.ButtonType.RAISED
+            backgroundColor += c(STYLE_PRIMARY_COLOR)
+            textFill = Color.WHITE
         }
     }
 

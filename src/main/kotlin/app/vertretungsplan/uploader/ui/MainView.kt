@@ -1,39 +1,29 @@
 package app.vertretungsplan.uploader.ui
 
+import app.vertretungsplan.uploader.BuildInfo
 import app.vertretungsplan.uploader.VertretungsplanUploaderMain
 import app.vertretungsplan.uploader.sync.FileInfo
-import app.vertretungsplan.uploader.ui.style.MainStyleSheet
-import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import app.vertretungsplan.uploader.sync.Sync.Callback
 import app.vertretungsplan.uploader.ui.helpers.*
+import app.vertretungsplan.uploader.ui.style.MainStyleSheet
+import app.vertretungsplan.uploader.ui.style.STYLE_BACKGROUND_COLOR
 import com.jfoenix.controls.*
+import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject
 import com.jfoenix.validation.NumberValidator
 import com.jfoenix.validation.RequiredFieldValidator
 import javafx.application.Platform
-import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ChangeListener
 import javafx.geometry.Pos
-import javafx.scene.control.ContentDisplay
-import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeTableView
 import javafx.scene.image.Image
 import javafx.scene.layout.StackPane
-import javafx.scene.text.TextAlignment
-import javafx.stage.DirectoryChooser
 import javafx.util.converter.NumberStringConverter
-import org.apache.commons.vfs2.FileObject
 import org.apache.commons.vfs2.VFS
 import tornadofx.*
 import java.io.File
-import com.sun.jna.platform.win32.Netapi32Util.User
-import javafx.scene.control.TreeTableColumn
-import com.jfoenix.controls.JFXTreeTableColumn
-import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject
-import javafx.scene.control.TreeTableView
-import javafx.scene.image.ImageView
 
 
 class MainView : View() {
@@ -210,6 +200,7 @@ class MainView : View() {
         }
 
         jfxButton(messages["save"].toUpperCase()) {
+            addClass(MainStyleSheet.raisedButton)
             action {
                 val valid = (form.children[0] as Fieldset).children.map {
                     if (it is Field) {
@@ -230,6 +221,33 @@ class MainView : View() {
                     configStore.ftpPort = ftpPort
                     configStore.ftpDir = ftpDir
                     (app as VertretungsplanUploaderMain).restartDaemon()
+                }
+            }
+        }
+
+        hbox {
+            label(messages["version"].format(BuildInfo().version))
+            spacer {}
+            jfxButton(messages["licenses"].toUpperCase()) {
+                action {
+                    val closeButton: JFXButton = this.jfxButton(messages.getString("dialog_close"))
+                    val dialog = this.jfxDialog(transitionType = JFXDialog.DialogTransition.BOTTOM) {
+                        setHeading(label(messages.getString("settings_licenses")))
+                        val text = resources.stream("licenses.txt").bufferedReader().use { it.readText() }
+                        setBody(jfxTextarea(text) {
+                                    style {
+                                        minHeight = 300.px
+                                        maxHeight = 300.px
+                                    }
+
+                                    isEditable = false
+                                })
+                        setActions(closeButton)
+                    }
+                    closeButton.action {
+                        dialog.close()
+                    }
+                    dialog.show(root)
                 }
             }
         }

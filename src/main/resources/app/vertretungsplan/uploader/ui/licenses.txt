@@ -1,0 +1,41 @@
+vertretungsplan-uploader is developed by:
+
+rami.io Software development
+Johan von Forstner and Raphael Michel
+Rathausstr. 19/2
+69126 Heidelberg
+Germany
+
+Contact:
+Email: info@vertretungsplan.app
+Phone: +49 621 180 696 58
+
+This app is free software and released without warranty under the terms of the GPL license version 3.
+Source code: https://github.com/vertretungsplanme/vertretungsplan-uploader
+
+This app contains code from the following projects:
+
+* OpenJDK by Oracle America, Inc. - GPLv2
+* Kotlin by JetBrains s.r.o – Apache License 2.0
+* TornadoFX by Edvin Syse – Apache License 2.0
+* JFoeniX – Apache License 2.0
+* appdirs by Iwao AVE – Apache License 2.0
+* Apache Commons VFS, HTTPClient and Net by The Apache Software Foundation – Apache License 2.0
+* Java Secure Channel by JCraft, Inc. - License at http://www.jcraft.com/jsch/LICENSE.txt
+* sentry-java by Functional Software, Inc. - License at https://raw.githubusercontent.com/getsentry/sentry-java/master/LICENSE
+* JUnique by Sauron Software – LGPL
+
+GPLv2
+Please see https://www.gnu.org/licenses/gpl-2.0
+
+GPLv3
+Please see https://www.gnu.org/licenses/gpl-3.0
+
+LGPL
+Please see https://www.gnu.org/licenses/lgpl-3.0
+
+Apache License
+Please see http://www.apache.org/licenses/LICENSE-2.0
+
+MIT License
+Please see https://opensource.org/licenses/MIT
