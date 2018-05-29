@@ -40,7 +40,7 @@
    File /r /x deb.tmp "jre"
 
    CreateDirectory "$SMPROGRAMS\vertretungsplan-uploader"
-   CreateShortCut "$SMPROGRAMS\vertretungsplan-uploader\vertretungsplan-uploader.lnk" "$INSTDIR\vertretungsplan-uploader.exe"
+   CreateShortCut "$SMPROGRAMS\vertretungsplan-uploader\vertretungsplan-uploader.lnk" "$INSTDIR\uploader.exe"
    CreateShortCut "$SMPROGRAMS\vertretungsplan-uploader\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
    ;Store installation folder
@@ -54,7 +54,7 @@
  SectionEnd
 
  Section "Desktop Shortcut"
-    CreateShortCut "$DESKTOP\vertretungsplan-uploader.lnk" "$INSTDIR\vertretungsplan-uploader.exe" ""
+    CreateShortCut "$DESKTOP\vertretungsplan-uploader.lnk" "$INSTDIR\uploader.exe" ""
  SectionEnd
 
  ;Language strings
