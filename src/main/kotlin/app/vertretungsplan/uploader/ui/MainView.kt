@@ -11,6 +11,8 @@ import com.jfoenix.controls.*
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject
 import com.jfoenix.validation.NumberValidator
 import com.jfoenix.validation.RequiredFieldValidator
+import com.sun.jna.platform.win32.Advapi32Util
+import com.sun.jna.platform.win32.WinReg
 import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
@@ -86,6 +88,25 @@ class MainView : View() {
                 else -> 0
             }
         }
+
+        if (isWindows()) {
+            autostart = Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER,
+                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "vertretungsplan-uploader")
+
+            autostartProperty.addListener {_, _, new ->
+                val installationDir = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER,
+                        "Software\\vertretungsplan-uploader", "")
+
+                if (installationDir != null) {
+                    if (new) {
+                        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
+                                "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "vertretungsplan-uploader",
+                                "\"$installationDir\\uploader.exe\"")
+                    }
+                }
+            }
+        }
+
     }
 
     private val contentBox = vbox {
@@ -194,7 +215,8 @@ class MainView : View() {
 
             fieldset(messages["group_app_settings"]) {
                 field(messages["autostart"]) {
-                    jfxCheckbox()
+                    jfxCheckbox(property=autostartProperty)
+                    this.isVisible = isWindows()
                 }
             }
         }
@@ -253,6 +275,8 @@ class MainView : View() {
         }
 
     }
+
+    private fun isWindows() = com.sun.jna.Platform.getOSType() == com.sun.jna.Platform.WINDOWS
 
     override val root: StackPane = stackpane {
         vbox {
