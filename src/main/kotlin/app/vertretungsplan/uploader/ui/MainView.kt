@@ -22,14 +22,18 @@ import javafx.geometry.Pos
 import javafx.scene.control.TreeTableView
 import javafx.scene.image.Image
 import javafx.scene.layout.StackPane
+import javafx.util.Duration
 import javafx.util.converter.NumberStringConverter
 import org.apache.commons.vfs2.VFS
 import tornadofx.*
+import java.awt.Desktop
 import java.io.File
+import java.net.URI
 
 
 class MainView : View() {
     private var configStore = (app as VertretungsplanUploaderMain).configStore
+    private val controller: MainController by inject()
 
     val sourceDirProperty = SimpleStringProperty(configStore.sourceDir)
     var sourceDir by sourceDirProperty
@@ -102,6 +106,37 @@ class MainView : View() {
                         Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
                                 "Software\\Microsoft\\Windows\\CurrentVersion\\Run", "vertretungsplan-uploader",
                                 "\"$installationDir\\uploader.exe\"")
+                    }
+                }
+            }
+        }
+
+        timeline {
+            keyframe(Duration.seconds(0.1)) {
+                setOnFinished {
+                    runAsync {
+                        controller.updateCheck()
+                    } ui {
+                        if (configStore.updateCheckNewerVersion.length > 1) {
+                            val closeButton: JFXButton = jfxButton(messages.getString("dialog_close"))
+                            val downloadButton: JFXButton = jfxButton(messages.getString("update_download").toUpperCase())
+                            val dialog = jfxDialog(transitionType = JFXDialog.DialogTransition.BOTTOM) {
+                                setBody(label(messages.getString("update_available").replace("{0}", configStore.updateCheckNewerVersion)))
+                                setHeading(label(messages.getString("update_head")))
+                                setActions(downloadButton, closeButton)
+                            }
+                            closeButton.action {
+                                dialog.close()
+                            }
+                            downloadButton.action {
+                                runAsync {
+                                    Desktop.getDesktop().browse(URI("https://github.com/vertretungsplanme/vertretungsplan-uploader/releases"));
+                                } ui {
+                                    dialog.close()
+                                }
+                            }
+                            dialog.show(root)
+                        }
                     }
                 }
             }

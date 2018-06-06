@@ -22,6 +22,7 @@ This app contains code from the following projects:
 * appdirs by Iwao AVE – Apache License 2.0
 * Apache Commons VFS, HTTPClient and Net by The Apache Software Foundation – Apache License 2.0
 * Java Secure Channel by JCraft, Inc. - License at http://www.jcraft.com/jsch/LICENSE.txt
+* Fuel by Kittinun Vantasin – MIT License
 * sentry-java by Functional Software, Inc. - License at https://raw.githubusercontent.com/getsentry/sentry-java/master/LICENSE
 * JUnique by Sauron Software – LGPL
 

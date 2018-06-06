@@ -1,5 +1,6 @@
 package app.vertretungsplan.uploader
 
+import app.vertretungsplan.uploader.BuildInfo
 import java.util.prefs.Preferences
 
 class VertretungsplanUploaderPrefs(private var data_dir: String) {
@@ -12,6 +13,8 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
     private val PREFS_KEY_FTP_PASSWORD = "ftp_password"
     private val PREFS_KEY_FTP_PORT = "ftp_port"
     private val PREFS_KEY_FTP_DIR = "ftp_dir"
+    private val PREFS_KEY_LAST_UPDATE_CHECK = "last_update_check_"
+    private val PREFS_KEY_UPDATE_CHECK_NEWER_VERSION = "update_check_newer_version_"
 
     var sourceDir: String?
         get() = prefs.get(PREFS_KEY_SOURCE_DIR, null)
@@ -65,4 +68,18 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
     val destUrl: String?
         get() = if (ftpUser != null && ftpPassword != null && ftpServer != null)
             "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/$ftpDir" else null
+
+    var lastUpdateCheck: Long
+        get() = prefs.getLong(PREFS_KEY_LAST_UPDATE_CHECK + BuildInfo().version, 0)
+        set(value) {
+            prefs.putLong(PREFS_KEY_LAST_UPDATE_CHECK + BuildInfo().version, value)
+            prefs.flush()
+        }
+
+    var updateCheckNewerVersion: String
+        get() = prefs.get(PREFS_KEY_UPDATE_CHECK_NEWER_VERSION + BuildInfo().version, "")
+        set (value) {
+            prefs.put(PREFS_KEY_UPDATE_CHECK_NEWER_VERSION + BuildInfo().version, value)
+            prefs.flush()
+        }
 }
