@@ -83,4 +83,5 @@
    DeleteRegKey /ifempty HKCU "Software\vertretungsplan-uploader"
    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\vertretungsplan-uploader"
    DeleteRegKey HKCR "vertretungsplan-uploader"
+   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "vertretungsplan-uploader"
  SectionEnd
