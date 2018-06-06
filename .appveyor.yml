@@ -26,3 +26,15 @@ test_script:
 artifacts:
   - path: dist\vertretungsplan-uploader.exe
     name: Installer
+
+deploy:
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: lOprJR3QLQx5gPp3LUyctRw0v7KIpgIlpw2Wd/esxAhv9t6Nm/8roM9LGN71mnw1
+  artifact: dist\vertretungsplan-uploader.exe
+  draft: false
+  prerelease: false
+  on:
+    branch: master
+    appveyor_repo_tag: true
