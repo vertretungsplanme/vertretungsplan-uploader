@@ -5,7 +5,7 @@ import java.util.*
 
 class BuildInfo {
     val properties: Properties = Properties().apply {
-        load(javaClass.getResourceAsStream("../../buildInfo.properties"))
+        load(javaClass.getResourceAsStream("/buildInfo.properties"))
     }
 
     val version: String
