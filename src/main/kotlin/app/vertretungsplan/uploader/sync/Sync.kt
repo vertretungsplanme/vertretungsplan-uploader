@@ -122,6 +122,11 @@ compareSize: Boolean = false, val compareDate: Boolean = true, val compareDateNe
     }
     
     protected fun remainingChildAction(remainingChild: FileObject): Int {
+        if (remainingChild.name.baseName.startsWith(".ht")) {
+            return 0
+            logger.info("not removing " + toString(remainingChild))
+        }
+
         var remaining  = remainingChild.delete(Selectors.SELECT_ALL)
         logger.info("Removed " + toString(remainingChild))
 
