@@ -22,7 +22,7 @@ and [JFoenix](https://github.com/jfoenixadmin/JFoenix).
 Project status
 --------------
 
-vertretungsplan-uploader is still in development and has not been tested in production
+vertretungsplan-uploader is in use by a couple of schools and seems to work well. However, we are planning to add some additional features in the future.
 
 
 License
