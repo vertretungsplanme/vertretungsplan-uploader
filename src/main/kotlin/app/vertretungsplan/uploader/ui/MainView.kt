@@ -29,6 +29,7 @@ import tornadofx.*
 import java.awt.Desktop
 import java.io.File
 import java.net.URI
+import java.net.URLEncoder
 
 
 class MainView : View() {
@@ -213,7 +214,8 @@ class MainView : View() {
                     jfxButton(messages["choose_folder"].toUpperCase()) {
                         action {
                             val man = VFS.getManager()
-                            val url = "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/"
+                            val url = "${protocol.toLowerCase()}://${urlencode(ftpUser)}:" +
+                                    "${urlencode(ftpPassword)}@$ftpServer:$ftpPort/"
                             val dest = man.resolveFile(url)
 
                             val dialog = JFXDialog()
@@ -309,6 +311,10 @@ class MainView : View() {
             }
         }
 
+    }
+
+    private fun urlencode(s: String): String {
+        return URLEncoder.encode(s, "utf-8")
     }
 
     private fun isWindows() = com.sun.jna.Platform.getOSType() == com.sun.jna.Platform.WINDOWS

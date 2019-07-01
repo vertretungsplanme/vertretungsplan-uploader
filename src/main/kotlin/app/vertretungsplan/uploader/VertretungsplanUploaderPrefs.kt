@@ -1,6 +1,7 @@
 package app.vertretungsplan.uploader
 
 import app.vertretungsplan.uploader.BuildInfo
+import java.net.URLEncoder
 import java.util.prefs.Preferences
 
 class VertretungsplanUploaderPrefs(private var data_dir: String) {
@@ -67,7 +68,11 @@ class VertretungsplanUploaderPrefs(private var data_dir: String) {
 
     val destUrl: String?
         get() = if (ftpUser != null && ftpPassword != null && ftpServer != null)
-            "${protocol.toLowerCase()}://$ftpUser:$ftpPassword@$ftpServer:$ftpPort/$ftpDir" else null
+            "${protocol.toLowerCase()}://${urlencode(ftpUser!!)}:${urlencode(ftpPassword!!)}@$ftpServer:$ftpPort/$ftpDir" else null
+
+    private fun urlencode(s: String): String {
+        return URLEncoder.encode(s, "utf-8")
+    }
 
     var lastUpdateCheck: Long
         get() = prefs.getLong(PREFS_KEY_LAST_UPDATE_CHECK + BuildInfo().version, 0)

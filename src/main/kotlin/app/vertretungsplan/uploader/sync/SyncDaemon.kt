@@ -55,6 +55,7 @@ class SyncDaemon(app: Application, var callback: Sync.Callback? = null): Thread(
                 Sync(configStore.sourceDir!!, destPath).run()
             }
         } catch (e: Throwable) {
+            e.printStackTrace()
             Thread.sleep(FREQUENCY);
             sync()
         }
